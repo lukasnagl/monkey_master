@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+
+require 'docopt'
+
+require 'monkey_master'
+
+# Parse Command Line Options
+doc = <<DOCOPT
+A tool for conveniently employing Android adb monkeys.
+
+Usage:
+  #{__FILE__} <app_id> [--devices <devices>] [--iterations <iterations>] [-k]
+  #{__FILE__} -k
+  #{__FILE__} -h | --help
+  #{__FILE__} --version
+
+Options:
+  -h --help     			Show this screen.
+  --version     			Show version.
+  --iterations <iterations>		The number of monkeys that should be run consecutively.
+  					It is preferable to run a high number of iterations of short-lived monkeys in order to handle freezes better.
+  --devices <devices>			Devices which should be used by the monkey commander separated by a ','. If not given, uses all devices.
+
+DOCOPT
+
+begin
+	opts = Docopt::docopt(doc)
+	commander = MonkeyMaster::MonkeyCommander.new(opts["<app_id>"])
+
+	devices = opts["--devices"]
+	commander.detect_devices(devices)
+
+	if(opts["-k"])
+		commander.kill_monkeys
+	end
+
+	if(opts["<app_id>"])
+		# An app id has been given, proceed with starting monkeys on the devices
+		iterations = opts["--iterations"]
+		if(iterations)
+			commander.iterations = iterations
+		end
+		commander.command_monkeys
+	end
+	exit 0
+rescue Docopt::Exit => e
+	puts e.message
+rescue ArgumentError => e
+	puts "ERROR: Invalid arguments: " + e.message
+end
+
+exit 1
