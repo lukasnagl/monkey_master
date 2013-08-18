@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["lukas.nagl@innovaptor.com"]
   spec.description   = %q{A tool for conveniently employing Android adb monkeys.}
   spec.summary       = %q{A tool for conveniently employing Android adb monkeys.}
-  spec.homepage      = "https://github.com/j4zz/monkey_master"
+  spec.homepage      = "https://github.com/j4zz/monkey_master.git"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
