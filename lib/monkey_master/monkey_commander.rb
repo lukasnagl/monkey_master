@@ -1,6 +1,8 @@
 require 'fileutils'
 require 'logger'
 require 'timeout'
+require 'pry'
+require_relative 'adb'
 
 module MonkeyMaster
   # A class for conveniently employing Android adb monkeys.
@@ -42,29 +44,12 @@ module MonkeyMaster
     #
     # +devices+:: nil, for automatic device detection; or a list of device IDs separated by ','
     def detect_devices(devices)
-      if devices
-        # Devices are given, create a list
-        devices = devices.split(',')
-        @device_list = devices
-      else
-        # No devices specified, detect them
-        device_list = `adb devices | grep -v "List" | grep "device" | awk '{print $1}'`
-        device_list = device_list.split("\n")
-        @device_list = device_list
-      end
+      @device_list = devices ? devices.split(',') : ADB.detect_devices
     end
 
-    # Kill the monkey on each device.
+    # Kill the monkey on all detected devices.
     def kill_monkeys
-      unless @device_list
-        @logger.warn('[CLEANUP] No devices specified yet.')
-        return
-      end
-
-      @device_list.each do |device|
-        @logger.info('[CLEANUP] KILLING the monkey on device #{device}.')
-        `adb -s #{device} shell ps | awk '/com\.android\.commands\.monkey/ { system("adb -s #{device} shell kill " $2) }'`
-      end
+      ADB.kill_monkeys(@device_list)
     end
 
     # Start running monkeys on all specified devices.
@@ -83,27 +68,22 @@ module MonkeyMaster
           master = Thread.new do
             # Monkey around in parallel
 
-            log_device_name = "monkey_current#{device}.txt"
-            current_log = File.join(@log_dir, log_device_name)
-            start_logging(device, current_log)
+            device_log = log_for_device(device)
+
             @logger.info("[MASTER #{device}] Starting to command monkeys.")
             @iterations.to_i.times do |i|
               @logger.info("\t[MASTER #{device}] Monkey #{i} is doing its thing…")
 
               # Start the monkey
-              `adb -s #{device} shell monkey -p #{@app_id} -v 80000 --throttle 100 --ignore-timeouts --pct-majornav 10 --pct-appswitch 0 --kill-process-after-error`
-              if $?.exitstatus != 0
+              if ADB.monkey_run(@app_id, device) != 0
                 @logger.info("\t\t[MASTER #{device}] Monkey encountered an error!")
               end
 
-              # Archive the log
-              log_archiving_name = "monkeylog_#{device}_#{i}.txt"
-              FileUtils.cp(current_log, File.join(@log_dir, log_archiving_name))
+              # Archive and clean the log
+              archive_and_clean_log(device_log, "monkeylog_#{device}_#{i}.txt")
 
-              # Clean the current log
-              File.truncate(current_log, 0)
               @logger.info("\t\t[MASTER #{device}] Monkey #{i} is killing the app now in preparation for the next monkey.")
-              `adb -s #{device} shell am force-stop #{@app_id}`
+              ADB.monkey_stop(@app_id)
             end
             @logger.info("[MASTER #{device}] All monkeys are done.")
           end
@@ -117,11 +97,24 @@ module MonkeyMaster
         masters.each(&:terminate)
       end
 
-      kill_monkeys
-      end_logging
+      ADB.kill_monkeys(@device_list)
+      ADB.end_logging
     end
 
     private
+
+    def archive_and_clean_log(device_log, name)
+      FileUtils.cp(device_log, File.join(@log_dir, name))
+      File.truncate(device_log, 0)
+    end
+
+    # start monkey log for a certain device
+    def log_for_device(device)
+      log_device_name = "monkey_current#{device}.txt"
+      log = File.join(@log_dir, log_device_name)
+      ADB.start_logging(device, log)
+      log
+    end
 
     # Do all necessary preparations that are necessary for the monkeys to run.
     def prepare
@@ -129,31 +122,7 @@ module MonkeyMaster
         Dir.mkdir(@log_dir)
         @logger.info("[SETUP] Writing to the following folder: #{@log_dir}")
       end
-      kill_monkeys
-    end
-
-    # Start logging on all devices.
-    def start_logging(device, current_log)
-      begin
-        timeout(5) do
-          @logger.info("[SETUP] Creating the following log file: #{current_log}")
-          `adb -s #{device} logcat -c #{current_log} &`
-          `adb -s #{device} logcat *:W > #{current_log} &`
-        end
-      rescue Timeout::Error
-        end_logging
-        raise ArgumentError, 'It doesn’t seem like there are ready, connected devices.'
-      end
-    end
-
-    # End logging on all devices.
-    def end_logging
-      @device_list.each do |device|
-        @logger.info("[CLEANUP] KILLING the logcat process on device #{device}.")
-        `adb -s #{device} shell ps | grep -m1 logcat | awk '{print $2}' | xargs adb -s #{device} shell kill`
-        @logger.info("[CLEANUP] KILLING the logcat process for the device #{device} on the machine.")
-        `ps ax | grep -m1 "adb -s #{device} logcat" | awk '{print $1}' | xargs kill`
-      end
+      ADB.kill_monkeys(@device_list)
     end
   end
 end
