@@ -1,5 +1,8 @@
 `monkey_master` - A tool for conveniently employing Android adb monkeys.
 ================================================================
+
+[![Build Status](https://travis-ci.org/j4zz/monkey_master.svg)](https://travis-ci.org/j4zz/monkey_master)
+
 Android's adb offers the ui/application exerciser [monkey](http://developer.android.com/tools/help/monkey.html). Conveniently employing it can be cumbersome, though:
 
 * It's inconvenient to kill a running monkey.
