@@ -18,3 +18,4 @@ tmp
 monkey_logs*
 .DS_Store
 mkmf.log
+blinkspec.json

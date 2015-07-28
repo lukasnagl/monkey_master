@@ -8,7 +8,7 @@ module MonkeyMaster
     # +app_id+:: ID of the android app for which the monkey should be run
     # +device+:: Device on which the adb monkey should be run
     # +args+:: Arguments passed to the adb monkey
-    def self.monkey_run(app_id, device, args='-v 80000 --throttle 100 --ignore-timeouts --pct-majornav 10 --pct-appswitch 0 --kill-process-after-error')
+    def self.monkey_run(app_id, device, args='-v 80000 --throttle 200 --ignore-timeouts --pct-majornav 20 --pct-appswitch 0 --kill-process-after-error')
       `adb -s #{device} shell monkey -p #{app_id} #{args}`
       $?.exitstatus
     end
@@ -16,7 +16,7 @@ module MonkeyMaster
     # Force stop a monkey for an app.
     #
     # +app_id+:: ID of the android app for which the monkey should be stopped
-    def self.monkey_stop(app_id)
+    def self.monkey_stop(app_id, device)
       `adb -s #{device} shell am force-stop #{app_id}`
     end
 
@@ -36,21 +36,22 @@ module MonkeyMaster
       end
 
       devices.each do |device|
-        puts '[ADB] KILLING the monkey on device #{device}.'
+        puts "[ADB] KILLING the monkey on device #{device}."
         `adb -s #{device} shell ps | awk '/com\.android\.commands\.monkey/ { system("adb -s #{device} shell kill " $2) }'`
       end
     end
 
     # Start logging on a certain device with logcat
     #
+    # +app_id+:: App for which logs should be retrieved
     # +device+:: Device for which logging should be started
     # +log+:: File that should be used for logging
-    def self.start_logging(device, log)
+    def self.start_logging(app_id, device, log)
       begin
         timeout(5) do
           puts "[ADB/LOGS] Logging device #{device} to #{log}."
           `adb -s #{device} logcat -c #{log} &`
-          `adb -s #{device} logcat *:W > #{log} &`
+          `adb -s #{device} logcat #{app_id}:W > #{log} &`
         end
       rescue Timeout::Error
         end_logging

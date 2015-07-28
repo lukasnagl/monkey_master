@@ -23,9 +23,9 @@ Options:
 DOCOPT
 
 begin
-  opts = docopt(doc)
-  unless ADB.adb?
-    puts "ERROR: adb is not installed or not accessible"
+  opts = Docopt::docopt(doc)
+  unless MonkeyMaster::ADB.adb?
+    puts 'ERROR: adb is not installed or not accessible'
     exit 2
   end
   commander = MonkeyMaster::MonkeyCommander.new(opts['<app_id>'])

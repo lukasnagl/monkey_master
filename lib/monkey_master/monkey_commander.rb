@@ -55,7 +55,7 @@ module MonkeyMaster
     # Start running monkeys on all specified devices.
     def command_monkeys
       if !@device_list || @device_list.empty?
-        fail(ArgumentError, 'No devices found or specified.')
+        fail(ArgumentError, 'No devices found or specified. Check if development mode is on.')
       end
 
       fail(ArgumentError, 'No app id specified.') unless @app_id
@@ -68,7 +68,7 @@ module MonkeyMaster
           master = Thread.new do
             # Monkey around in parallel
 
-            device_log = log_for_device(device)
+            device_log = log_for_device(@app_id, device)
 
             @logger.info("[MASTER #{device}] Starting to command monkeys.")
             @iterations.to_i.times do |i|
@@ -83,7 +83,7 @@ module MonkeyMaster
               archive_and_clean_log(device_log, "monkeylog_#{device}_#{i}.txt")
 
               @logger.info("\t\t[MASTER #{device}] Monkey #{i} is killing the app now in preparation for the next monkey.")
-              ADB.monkey_stop(@app_id)
+              ADB.monkey_stop(@app_id, device)
             end
             @logger.info("[MASTER #{device}] All monkeys are done.")
           end
@@ -98,7 +98,7 @@ module MonkeyMaster
       end
 
       ADB.kill_monkeys(@device_list)
-      ADB.end_logging
+      ADB.end_logging(@device_list)
     end
 
     private
@@ -109,10 +109,10 @@ module MonkeyMaster
     end
 
     # start monkey log for a certain device
-    def log_for_device(device)
+    def log_for_device(app_id, device)
       log_device_name = "monkey_current#{device}.txt"
       log = File.join(@log_dir, log_device_name)
-      ADB.start_logging(device, log)
+      ADB.start_logging(app_id, device, log)
       log
     end
 
