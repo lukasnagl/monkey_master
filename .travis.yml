@@ -1,0 +1,11 @@
+language: ruby
+
+rvm:
+  - 2.0.0
+
+notifications:
+  email:
+    recipients:
+      - lukas.nagl@innovaptor.com
+    on_failure: change
+    on_success: never
