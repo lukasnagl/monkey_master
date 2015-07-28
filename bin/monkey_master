@@ -8,7 +8,7 @@ doc = <<DOCOPT
 A tool for conveniently employing Android adb monkeys.
 
 Usage:
-  #{__FILE__} <app_id> [--devices <devices>] [--iterations <iterations>] [-k]
+  #{__FILE__} <app_id> [--devices <devices>] [--iterations <iterations>] [-k] [--adb <adb_args>]
   #{__FILE__} -k
   #{__FILE__} -h | --help
   #{__FILE__} --version
@@ -19,7 +19,7 @@ Options:
   --iterations <iterations>   The number of monkeys that should be run consecutively.
             It is preferable to run a high number of iterations of short-lived monkeys in order to handle freezes better.
   --devices <devices>     Devices which should be used by the monkey commander separated by a ','. If not given, uses all devices.
-
+  --adb <adb_args>      Arguments for running the adb monkey as a string, e.g. "--throttle 500". If not provided, reasonable defaults will be used.
 DOCOPT
 
 begin
@@ -39,7 +39,7 @@ begin
     # An app id has been given, proceed with starting monkeys on the devices
     iterations = opts['--iterations']
     commander.iterations = iterations if iterations
-    commander.command_monkeys
+    commander.command_monkeys(opts['--adb'])
   end
   exit 0
 rescue Docopt::Exit => e

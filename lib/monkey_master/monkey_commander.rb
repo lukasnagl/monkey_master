@@ -53,7 +53,10 @@ module MonkeyMaster
     end
 
     # Start running monkeys on all specified devices.
-    def command_monkeys
+    #
+    # +adb_args+:: Arguments passed to the adb monkeys
+    def command_monkeys(adb_args='-v 80000 --throttle 200 --ignore-timeouts --pct-majornav 20 --pct-appswitch 0 --kill-process-after-error')
+      @logger.info("[SETUP] Will run adb monkeys with the following arguments: #{adb_args}")
       if !@device_list || @device_list.empty?
         fail(ArgumentError, 'No devices found or specified. Check if development mode is on.')
       end
@@ -75,7 +78,7 @@ module MonkeyMaster
               @logger.info("\t[MASTER #{device}] Monkey #{i} is doing its thing…")
 
               # Start the monkey
-              if ADB.monkey_run(@app_id, device) != 0
+              if ADB.monkey_run(@app_id, device, adb_args) != 0
                 @logger.info("\t\t[MASTER #{device}] Monkey encountered an error!")
               end
 

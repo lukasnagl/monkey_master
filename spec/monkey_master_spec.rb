@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe MonkeyMaster::MonkeyCommander do
   let(:device_stubs) { %w(80123 34555) }
+  let(:default_args) { '-v 80000 --throttle 200 --ignore-timeouts --pct-majornav 20 --pct-appswitch 0 --kill-process-after-error' }
 
   before do
     allow(MonkeyMaster::ADB).to receive(:monkey_run) { 0 }
@@ -43,12 +44,19 @@ describe MonkeyMaster::MonkeyCommander do
         before do
           allow(commander).to receive(:archive_and_clean_log) { nil }
         end
+
         it 'should start and stop adb monkeys' do
           device_stubs.each do |device_stub|
-            expect(MonkeyMaster::ADB).to receive(:monkey_run).with(app_id, device_stub)
+            expect(MonkeyMaster::ADB).to receive(:monkey_run).with(app_id, device_stub, default_args)
             expect(MonkeyMaster::ADB).to receive(:monkey_stop).with(app_id, device_stub)
           end
           commander.command_monkeys
+        end
+
+        it 'should accept arguments for adb monkeys' do
+          adb_args = "--throttle 3000"
+          expect(MonkeyMaster::ADB).to receive(:monkey_run).with(app_id, device_stubs.first, adb_args)
+          commander.command_monkeys(adb_args)
         end
 
         it 'should make a log for each iteration of each device' do

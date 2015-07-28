@@ -1,4 +1,5 @@
 require 'mkmf'
+require 'pry'
 
 module MonkeyMaster
   # Provide helpers to work with Android ADB
@@ -8,7 +9,7 @@ module MonkeyMaster
     # +app_id+:: ID of the android app for which the monkey should be run
     # +device+:: Device on which the adb monkey should be run
     # +args+:: Arguments passed to the adb monkey
-    def self.monkey_run(app_id, device, args='-v 80000 --throttle 200 --ignore-timeouts --pct-majornav 20 --pct-appswitch 0 --kill-process-after-error')
+    def self.monkey_run(app_id, device, args)
       `adb -s #{device} shell monkey -p #{app_id} #{args}`
       $?.exitstatus
     end
