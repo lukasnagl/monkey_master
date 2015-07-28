@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'docopt'
-
 require 'monkey_master'
 
 # Parse Command Line Options
@@ -15,38 +14,34 @@ Usage:
   #{__FILE__} --version
 
 Options:
-  -h --help     			Show this screen.
-  --version     			Show version.
-  --iterations <iterations>		The number of monkeys that should be run consecutively.
-  					It is preferable to run a high number of iterations of short-lived monkeys in order to handle freezes better.
-  --devices <devices>			Devices which should be used by the monkey commander separated by a ','. If not given, uses all devices.
+  -h --help           Show this screen.
+  --version           Show version.
+  --iterations <iterations>   The number of monkeys that should be run consecutively.
+            It is preferable to run a high number of iterations of short-lived monkeys in order to handle freezes better.
+  --devices <devices>     Devices which should be used by the monkey commander separated by a ','. If not given, uses all devices.
 
 DOCOPT
 
 begin
-	opts = Docopt::docopt(doc)
-	commander = MonkeyMaster::MonkeyCommander.new(opts["<app_id>"])
+  opts = docopt(doc)
+  commander = MonkeyMaster::MonkeyCommander.new(opts['<app_id>'])
 
-	devices = opts["--devices"]
-	commander.detect_devices(devices)
+  devices = opts['--devices']
+  commander.detect_devices(devices)
 
-	if(opts["-k"])
-		commander.kill_monkeys
-	end
+  commander.kill_monkeys if opts['-k']
 
-	if(opts["<app_id>"])
-		# An app id has been given, proceed with starting monkeys on the devices
-		iterations = opts["--iterations"]
-		if(iterations)
-			commander.iterations = iterations
-		end
-		commander.command_monkeys
-	end
-	exit 0
+  if opts['<app_id>']
+    # An app id has been given, proceed with starting monkeys on the devices
+    iterations = opts['--iterations']
+    commander.iterations = iterations if iterations
+    commander.command_monkeys
+  end
+  exit 0
 rescue Docopt::Exit => e
-	puts e.message
+  puts e.message
 rescue ArgumentError => e
-	puts "ERROR: Invalid arguments: " + e.message
+  puts "ERROR: Invalid arguments: #{e.message}"
 end
 
 exit 1
