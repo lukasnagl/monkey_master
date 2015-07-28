@@ -39,7 +39,7 @@ begin
     # An app id has been given, proceed with starting monkeys on the devices
     iterations = opts['--iterations']
     commander.iterations = iterations if iterations
-    commander.command_monkeys(opts['--adb'])
+    opts['--adb'].nil? ? commander.command_monkeys : commander.command_monkeys(opts['--adb'])
   end
   exit 0
 rescue Docopt::Exit => e
