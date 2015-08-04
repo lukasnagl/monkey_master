@@ -1,7 +1,7 @@
 `monkey_master` - A tool for conveniently employing Android adb monkeys.
 ================================================================
 
-[![Build Status](https://travis-ci.org/j4zz/monkey_master.svg)](https://travis-ci.org/j4zz/monkey_master)
+[![Build Status](https://travis-ci.org/j4zz/monkey_master.svg)](https://travis-ci.org/j4zz/monkey_master) [![Gem Version](https://badge.fury.io/rb/monkey_master.svg)](http://badge.fury.io/rb/monkey_master)
 
 Android's adb offers the ui/application exerciser [monkey](http://developer.android.com/tools/help/monkey.html). Conveniently employing it can be cumbersome, though:
 
@@ -31,11 +31,24 @@ Furthermore, you need to have a device in *development mode* connected. Currentl
 Usage
 ================================================================
 
-	Usage:
-  		monkey_master <app_id> [--devices <devices>] [--iterations <iterations>] [-k]
-  		monkey_master -k
-  		monkey_master -h | --help
-  		monkey_master --version
+```
+Usage:
+  monkey_master <app_id> [--devices <devices>] [--iterations <iterations>] [-k] [--adb <adb_args>]
+  monkey_master -k
+  monkey_master -h | --help
+  monkey_master --version
+
+Options:
+  -h --help                   Show this screen.
+  --version                   Show version.
+  --iterations <iterations>   The number of monkeys that should be run consecutively.
+                              It is preferable to run a high number of iterations of short-lived monkeys
+                              in order to handle freezes better.
+  --devices <devices>         Devices which should be used by monkey_master separated by a ','.
+                              If the argument is not provided, all detected devices are used.
+  --adb <adb_args>            Arguments for running the adb monkey passed as a String, e.g. "--throttle 500".
+                              If not provided, reasonable defaults will be used.
+```
 
 Usage Examples
 ----------------------------------------------------------------
