@@ -14,12 +14,15 @@ Usage:
   #{__FILE__} --version
 
 Options:
-  -h --help           Show this screen.
-  --version           Show version.
+  -h --help                   Show this screen.
+  --version                   Show version.
   --iterations <iterations>   The number of monkeys that should be run consecutively.
-            It is preferable to run a high number of iterations of short-lived monkeys in order to handle freezes better.
-  --devices <devices>     Devices which should be used by the monkey commander separated by a ','. If not given, uses all devices.
-  --adb <adb_args>      Arguments for running the adb monkey as a string, e.g. "--throttle 500". If not provided, reasonable defaults will be used.
+                              It is preferable to run a high number of iterations of short-lived monkeys
+                              in order to handle freezes better.
+  --devices <devices>         Devices which should be used by monkey_master separated by a ','.
+                              If the argument is not provided, all detected devices are used.
+  --adb <adb_args>            Arguments for running the adb monkey passed as a String, e.g. "--throttle 500".
+                              If not provided, reasonable defaults will be used.
 DOCOPT
 
 begin
