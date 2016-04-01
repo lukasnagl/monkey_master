@@ -7,14 +7,14 @@ Android's adb offers the ui/application exerciser [monkey](http://developer.andr
 
 * It's inconvenient to kill a running monkey.
 * You can't let it run unobserved for extended periods of time because it ends after a crash or a freeze.
-* You either watch the log in your (running) sdk, or you manually handle logcat.
+* You either need to watch the log in your (running) sdk, or you manually handle logcat.
 * Managing all of the above on multiple devices is a real pain.
 
 `monkey_master` is a convenience tool for solving these issues. It can easily be combined with other tools, for example to build a fully automated build & test system.
 
 Besides having convenience commands for starting and killing adb monkeys, it has multi-device support (simultaneously running monkeys on multiple devices) and automatically creates log files for each device.
 
-For an example of a `monkey_master` test setup, and the reasoning behind the project, visit [this blog post](http://innovaptor.com/blog/2013/08/18/building-an-automated-testing-and-error-reporting-system-for-android-apps-with-monkey-master-and-crashlytics.html).
+For an example of a `monkey_master` test setup, and the reasoning behind the project, visit [this blog post](https://www.innovaptor.com/blog/2013/08/18/building-an-automated-testing-and-error-reporting-system-for-android-apps-with-monkey-master-and-crashlytics/).
 
 Installation
 ================================================================
