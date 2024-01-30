@@ -1,5 +1,8 @@
-`monkey_master` - A tool for conveniently employing Android adb monkeys.
+[deprecated] `monkey_master` - A tool for conveniently employing Android adb monkeys.
 ================================================================
+
+**Deprecation Notice**: While this tool might functionally still work, it has not been kept in maintenance. It is left here as a basis for future projects.
+
 
 [![Build Status](https://travis-ci.org/j4zz/monkey_master.svg)](https://travis-ci.org/j4zz/monkey_master) [![Gem Version](https://badge.fury.io/rb/monkey_master.svg)](http://badge.fury.io/rb/monkey_master)
 
